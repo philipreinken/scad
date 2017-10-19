@@ -1,4 +1,5 @@
 $fn=72; // Decent curves please.
+$debug=false;
 
 cover_width=83;
 cover_depth=96;
@@ -14,6 +15,11 @@ gearshaft_offset=28;
 ra_radius=45;
 
 axis_offset=sqrt((ra_radius*ra_radius)-((cover_width/2)*(cover_width/2)));
+
+module debug () {
+    translate([0, cover_thickness, cover_thickness])
+    cube([cover_width, cover_depth, cover_height]);
+}
 
 module ra_axis () {
     translate([cover_width/2, cover_depth+axis_offset, 0])
@@ -50,6 +56,9 @@ module ra_cover () {
             ra_axis();
             gearshaft();
             connector();
+            if ($debug) {
+                debug();
+            }
         }
     }
 }
