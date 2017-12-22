@@ -1,14 +1,16 @@
+/* Image size: 256px*256px */
+
 $fn=72;
 
-size=100;
-thickness=2;
+size=60;
+thickness=2.4;
 inner=size-thickness*2;
 
 module photo() {
-    rotate([90, 0, 180])
-        translate([-size/2, size/2 , 0])
-            scale([size*0.004, size*0.004, 0.02])
-                surface("image.png", true, false, 0);   
+    rotate([90, 0, 0])
+        translate([size/2, size/2 , 0])
+            scale([size*0.004, size*0.004, thickness/(size*2)])
+                surface("image.png", true, false, 0);
 }
 
 module hollow_cube() {
@@ -24,7 +26,4 @@ module lamp() {
     hollow_cube();
 }
 
-intersection() {
-    lamp();
-    cube(size);
-}
+lamp();
