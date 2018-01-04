@@ -68,7 +68,11 @@ translate([-coverRadius, 0, 0]) difference() {
     nubsies();
 }
 
-translate([tubeRadius+5, 0, 0]) union() {
-    sled();
-    nubsies();
+translate([tubeRadius+5, 0, 0]) difference() {
+    union() {
+        sled();
+        nubsies();
+    }
+    translate([-tubeRadius-1, -tubeDiameter-1, 0])
+        cube(tubeDiameter+2);
 }
