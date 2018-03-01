@@ -29,24 +29,24 @@ module ra_axis () {
 
 module ra_box () {
     difference() {
-        cube([cover_width, cover_depth, cover_height]);
-        translate([cover_thickness, cover_thickness, 0]) cube([cover_width-cover_thickness*2, cover_depth, cover_height-cover_thickness]);
+        cube([cover_width, cover_depth, cover_height + 0.02]);
+        translate([cover_thickness, cover_thickness, -0.01]) cube([cover_width-cover_thickness*2, cover_depth, cover_height-cover_thickness]);
     }
 }
 
 module gearshaft () {
-    translate([cover_width, cover_depth-gearshaft_offset, gearshaft_offset])
+    translate([cover_width + 0.01, cover_depth-gearshaft_offset, gearshaft_offset])
     rotate([-90, 0, 90])
     hull() {
-        cylinder(r=gearshaft_radius, h=cover_thickness);
-        translate([30, 0, 0]) cylinder(r=gearshaft_radius, h=cover_thickness);
+        cylinder(r=gearshaft_radius, h=cover_thickness + 0.02);
+        translate([30, 0, 0]) cylinder(r=gearshaft_radius, h=cover_thickness + 0.02);
     }
 }
 
 module connector () {
-    translate([cover_thickness+connector_radius+3, 0, cover_height-connector_radius-cover_thickness-3])
+    translate([cover_thickness+connector_radius+3, -0.01, cover_height-connector_radius-cover_thickness-3])
         rotate([-90, 0, 0])
-            cylinder(r=connector_radius, h=cover_thickness+1);
+            cylinder(r=connector_radius, h=cover_thickness+0.02);
 }
 
 module ra_cover () {
