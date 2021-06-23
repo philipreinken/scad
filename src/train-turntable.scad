@@ -7,17 +7,14 @@ use <trains/track-wooden/track-standard.scad>;
 include <NopSCADlib/lib.scad>;
 include <MCAD/bearing.scad>;
 
-VIEW_MODE=true;
+VIEW_MODE=false;
 TEST_MODE=false;
 
 function assembly_diameter() = 150;
 function bearing_model() = 608;
-function magnet_size() = 5;
+function magnet_size() = 5.5;
 
 module turntable_base_ring(diameter) {
-  // wood_track_arc(radius=(diameter / 2) - wood_width(), angle=360, rails=false);
-  // translate([-diameter / 4 - 5, -wood_width() / 2, 0])
-  //   wood_track(length=diameter / 2 + 10, rails=false);
   difference() {
     cylinder(h=wood_height(), d=diameter);
     translate([0, 0, -$o])
@@ -30,10 +27,10 @@ module turntable_base_ring(diameter) {
 }
 
 module bearing_base(model) {
-  cylinder(d=bearingDimensions(model)[0] + 3, h=1);
+  cylinder(d=bearingDimensions(model)[0] + 3, h=0.75);
   difference() {
-    cylinder(d=bearingDimensions(model)[0], h=bearingDimensions(model)[2]);
-    translate([0, 0, bearingDimensions(model)[2]])
+    cylinder(d=bearingDimensions(model)[0], h=bearingDimensions(model)[2] + 0.75);
+    translate([0, 0, bearingDimensions(model)[2] + 0.75])
       insert_hole(F1BM3);
   }
 }
@@ -83,10 +80,20 @@ module middle_track_bearing_hole() {
   }
 }
 
+module middle_track_magnet_holes() {
+  translate([wood_plug_radius() + wood_plug_neck_length(), wood_width() / 2 - magnet_size() / 2, -$o])
+    scale([1, 1, 1.25])
+      magnet_hole();
+  translate([assembly_diameter() - wood_plug_radius() * 2 - wood_plug_neck_length(), wood_width() / 2 - magnet_size() / 2, -$o])
+    scale([1, 1, 1.25])
+      magnet_hole();
+}
+
 module middle_track_assembly() {
   difference() {
     middle_track();
     middle_track_bearing_hole();
+    middle_track_magnet_holes();
   }
 }
 
@@ -112,3 +119,5 @@ if (VIEW_MODE) {
         magnet_hole();
     }
 }
+
+middle_track_assembly();
