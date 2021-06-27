@@ -56,14 +56,20 @@ module turntable_base() {
 }
 
 module ramp(length, angle) {
-  intersection() {
-    rotate([0, -angle, 0])
-      translate([0, 0, -wood_well_height()])
-        wood_track(length=50);
-    wood_track(length);
+  difference() {
+    union() {
+      intersection() {
+        rotate([0, -angle, 0])
+          translate([0, 0, -wood_well_height()])
+            wood_track(length=50);
+        wood_track(length);
+      }
+      translate([wood_well_height() / tan(angle), 0, 0])
+        wood_track(length - wood_well_height() / tan(angle), bevel_ends=false);
+    }
+    rotate([0, -angle - 10, 0])
+      cube(wood_width());
   }
-  translate([wood_well_height() / tan(angle), 0, 0])
-    wood_track(length - wood_well_height() / tan(angle), bevel_ends=false);
 }
 
 module middle_track() {
