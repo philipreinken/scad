@@ -1,4 +1,6 @@
 include <NopSCADlib/lib.scad>;
+include <NopSCADlib/printed/printed_box.scad>;
+
 include <OpenSCAD-Arduino-Mounting-Library/arduino.scad>;
 
 DEBUG = false;
@@ -6,23 +8,32 @@ DEBUG = false;
 SCREW_INSERT_TYPE = F1BM3;
 
 HOUSING_THICKNESS = 1.6;
-HOUSING_PADDING = 5;
+HOUSING_WIDTH_ADD = 10;
+HOUSING_HEIGHT_ADD = 30;
+
 MOUNTING_STANDOFF_HEIGHT = HOUSING_THICKNESS + insert_length(SCREW_INSERT_TYPE);
 
 RJ45_DIMENSIONS = [12, 20, 10];
-ARDUINO_DIMENSIONS = [101.6, 53.34, 1.6];
-RAMPS_DIMENSIONS = [101.6, 60.19, 1.6];
-ONSTEP_SHIELD_DIMENSIONS = [115.45, 66, 1.6];
+ARDUINO_DIMENSIONS = [53.34, 101.6, 1.6];
+RAMPS_DIMENSIONS = [60.19, 101.6, 1.6];
+ONSTEP_SHIELD_DIMENSIONS = [66, 115.45, 1.6];
 
-OFFSET_ARDUINO = [5, 0, MOUNTING_STANDOFF_HEIGHT];
-OFFSET_ARDUINO_RAMPS = [OFFSET_ARDUINO.x + 31, OFFSET_ARDUINO.y + 50, OFFSET_ARDUINO.z + 13.25];
-OFFSET_RAMPS_ONSTEP_SHIELD = [OFFSET_ARDUINO_RAMPS.x -3, OFFSET_ARDUINO_RAMPS.y + 42, OFFSET_ARDUINO_RAMPS.z + 12.75];
+OFFSET_ORIGIN_ARDUINO = [0, 0, 0];
+OFFSET_ORIGIN_RAMPS = [RAMPS_DIMENSIONS.x / 2, RAMPS_DIMENSIONS.y / 2, 0];
+OFFSET_ORIGIN_ONSTEP_SHIELD = [ONSTEP_SHIELD_DIMENSIONS.x / 2, ONSTEP_SHIELD_DIMENSIONS.y / 2, 0];
+
+OFFSET_ARDUINO = [0, 0, MOUNTING_STANDOFF_HEIGHT];
+OFFSET_ARDUINO_RAMPS = [OFFSET_ARDUINO.x, OFFSET_ARDUINO.y, OFFSET_ARDUINO.z + 13.25];
+OFFSET_ARDUINO_ONSTEP_SHIELD = [OFFSET_ARDUINO_RAMPS.x - 6, OFFSET_ARDUINO_RAMPS.y + 35, OFFSET_ARDUINO_RAMPS.z + 12.75];
 
 HOUSING_DIMENSIONS = [
-  2 * HOUSING_THICKNESS + 2 * HOUSING_PADDING + ONSTEP_SHIELD_DIMENSIONS.x + OFFSET_RAMPS_ONSTEP_SHIELD.x,
-  2 * HOUSING_THICKNESS + 2 * HOUSING_PADDING + ONSTEP_SHIELD_DIMENSIONS.y,
-  2 * HOUSING_THICKNESS + 2 * HOUSING_PADDING + MOUNTING_STANDOFF_HEIGHT + OFFSET_RAMPS_ONSTEP_SHIELD.z + RJ45_DIMENSIONS.z,
+  max(ARDUINO_DIMENSIONS.x, RAMPS_DIMENSIONS.x, ONSTEP_SHIELD_DIMENSIONS.x) + max(abs(OFFSET_ARDUINO.x), abs(OFFSET_ARDUINO_RAMPS.x), abs(OFFSET_ARDUINO_ONSTEP_SHIELD.x)) + HOUSING_WIDTH_ADD,
+  max(ARDUINO_DIMENSIONS.y, RAMPS_DIMENSIONS.y, ONSTEP_SHIELD_DIMENSIONS.y) + max(abs(OFFSET_ARDUINO.y), abs(OFFSET_ARDUINO_RAMPS.y), abs(OFFSET_ARDUINO_ONSTEP_SHIELD.y)),
+  max(ARDUINO_DIMENSIONS.z, RAMPS_DIMENSIONS.z, ONSTEP_SHIELD_DIMENSIONS.z) + max(abs(OFFSET_ARDUINO.z), abs(OFFSET_ARDUINO_RAMPS.z), abs(OFFSET_ARDUINO_ONSTEP_SHIELD.z)) + HOUSING_HEIGHT_ADD,
 ];
+
+OFFSET_ORIGIN_HOUSING = [HOUSING_DIMENSIONS.x / 2, HOUSING_DIMENSIONS.y / 2, 0];
+OFFSET_ARDUINO_HOUSING = [OFFSET_ARDUINO_ONSTEP_SHIELD.x - HOUSING_WIDTH_ADD, 0, 0];
 
 ramps_pcb = [
     "ramps_pcb",
@@ -31,18 +42,18 @@ ramps_pcb = [
     0,
     0,
     0,
-    "Gray",
+    "SteelBlue",
     false,
     [],
     [
-        [1, 8, 180, "gterm35", 4],
-        [96, 3, 0, "2p54header", 4, 2],
-        [78, 3, 0, "2p54header", 5, 2],
-        [62, 3, 0, "2p54header", 4, 2],
-        [45, 4, 0, "2p54header", 4, 3],
-        [100, 37, 90, "2p54header", 18, 1],
-        [96, 37, 90, "-2p54header", 18, 2],
-        [78, 59, 0, "-2p54header", 8, 1],
+        [RAMPS_DIMENSIONS.x - 7, 1, 270, "gterm35", 4],
+        [RAMPS_DIMENSIONS.x - 3, 96, 90, "2p54header", 4, 2],
+        [RAMPS_DIMENSIONS.x - 3 ,78, 90, "2p54header", 5, 2],
+        [RAMPS_DIMENSIONS.x - 3, 62, 90, "2p54header", 4, 2],
+        [RAMPS_DIMENSIONS.x - 4, 45, 90, "2p54header", 4, 3],
+        [RAMPS_DIMENSIONS.x - 36, 100, 180, "2p54header", 18, 1],
+        [RAMPS_DIMENSIONS.x - 36, 96, 180, "-2p54header", 18, 2],
+        [RAMPS_DIMENSIONS.x - 58, 78, 90, "-2p54header", 8, 1],
     ],
     []
 ];
@@ -58,34 +69,56 @@ onstep_ramps_shield = [
   false,
   [],
   [
-    [10, 4, 0, "-2p54socket", 4, 3],
-    [27, 3, 0, "-2p54socket", 4, 2],
-    [43, 3, 0, "-2p54socket", 5, 2],
-    [61, 3, 0, "-2p54socket", 4, 2],
-    [65, 37, 90, "-2p54socket", 18, 1],
-    [105, 8, 0, "rj45"],
-    [105, 24, 0, "rj45"],
-    [105, 40, 0, "rj45"],
-    [105, 56, 0, "rj45"],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 4, 10, 90, "-2p54socket", 4, 3],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 3, 27, 90, "-2p54socket", 4, 2],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 3, 43, 90, "-2p54socket", 5, 2],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 3, 61, 90, "-2p54socket", 4, 2],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 36, 65, 180, "-2p54socket", 18, 1],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 8, 105, 90, "rj45"],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 24, 105, 90, "rj45"],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 40, 105, 90, "rj45"],
+    [ONSTEP_SHIELD_DIMENSIONS.x - 56, 105, 90, "rj45"],
   ]
 ];
 
+housing = pbox(
+  name = "housing",
+  wall = HOUSING_THICKNESS,
+  top_t = HOUSING_THICKNESS,
+  base_t = HOUSING_THICKNESS,
+  radius = 4,
+  size = HOUSING_DIMENSIONS,
+  screw = M3_cap_screw,
+);
+
+module arduino_board() {
+  translate(OFFSET_ORIGIN_ARDUINO) {
+    arduino(MEGA2560);
+  }
+}
+
+module ramps_pcb_board() {
+  translate(OFFSET_ORIGIN_RAMPS) {
+    pcb(ramps_pcb);
+  }
+}
+
+module onstep_ramps_shield_board() {
+  translate(OFFSET_ORIGIN_ONSTEP_SHIELD) {
+    pcb(onstep_ramps_shield);
+  }
+}
+
 module boards() {
   union() {
-    translate(OFFSET_RAMPS_ONSTEP_SHIELD) {
-      rotate([0, 0, 90]) {
-        pcb(onstep_ramps_shield);
-      }
+    translate(OFFSET_ARDUINO_ONSTEP_SHIELD) {
+      onstep_ramps_shield_board();
     }
     translate(OFFSET_ARDUINO_RAMPS) {
-      rotate([0, 0, 90]) {
-        pcb(ramps_pcb);
-      }
+      ramps_pcb_board();
     }
     translate(OFFSET_ARDUINO) {
-      rotate([0, 0, 0]) {
-        arduino(MEGA2560);
-      }
+      arduino_board();
     }
   }
 }
@@ -98,17 +131,53 @@ module mounting_standoffs(boardType, type, height) {
   }
 }
 
-module bounding_box() {
-  translate([-HOUSING_PADDING -HOUSING_THICKNESS, -HOUSING_PADDING -HOUSING_THICKNESS, 0]) {
-    cube([HOUSING_DIMENSIONS.y, HOUSING_DIMENSIONS.x, HOUSING_DIMENSIONS.z]);
+module cutouts() {
+  union() {
+    translate(OFFSET_ARDUINO_ONSTEP_SHIELD) {
+      translate(OFFSET_ORIGIN_ONSTEP_SHIELD) {
+        pcb_cutouts(onstep_ramps_shield);
+      }
+    }
+  }
+}
+
+module housing() {
+  difference() {
+    translate([0, HOUSING_DIMENSIONS.y, HOUSING_DIMENSIONS.z + HOUSING_THICKNESS * 2 + eps]) {
+      vflip() {
+        translate(OFFSET_ARDUINO_HOUSING) {
+          translate(OFFSET_ORIGIN_HOUSING) {
+            pbox(housing);
+          }
+        }
+      }
+    }
+    cutouts();
+  }
+}
+
+module housing_base() {
+  translate(OFFSET_ARDUINO_HOUSING) {
+    translate(OFFSET_ORIGIN_HOUSING) {
+      pbox_base(housing) {
+        translate([-HOUSING_DIMENSIONS.x / 2 - OFFSET_ARDUINO_HOUSING.x, -HOUSING_DIMENSIONS.y / 2 - OFFSET_ARDUINO_HOUSING.y, 0]) {
+          mounting_standoffs(MEGA2560, F1BM3, MOUNTING_STANDOFF_HEIGHT);
+        }
+      }
+    }
   }
 }
 
 if (DEBUG) {
   boards();
-  // bounding_box();
+  housing_base();
+
+  %render() housing();
+  #render() cutouts();
+} else {
+  housing_base();
+
+  translate([HOUSING_DIMENSIONS.x + 20, 0, 0]) {
+    housing();
+  }
 }
-
-mounting_standoffs(MEGA2560, F1BM3, MOUNTING_STANDOFF_HEIGHT);
-
-cube([ONSTEP_SHIELD_DIMENSIONS.y, ONSTEP_SHIELD_DIMENSIONS.x + OFFSET_RAMPS_ONSTEP_SHIELD.x, ONSTEP_SHIELD_DIMENSIONS.z]);
