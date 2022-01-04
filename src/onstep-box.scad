@@ -1,9 +1,12 @@
 include <NopSCADlib/lib.scad>;
 include <NopSCADlib/printed/printed_box.scad>;
+include <NopSCADlib/vitamins/pcb.scad>;
 
 include <OpenSCAD-Arduino-Mounting-Library/arduino.scad>;
 
 DEBUG = false;
+SHOW_LID = true;
+SHOW_HOUSING = true;
 
 SCREW_INSERT_TYPE = F1BM3;
 
@@ -46,7 +49,7 @@ ramps_pcb = [
     false,
     [],
     [
-        [RAMPS_DIMENSIONS.x - 7, 1, 270, "gterm35", 4],
+        [RAMPS_DIMENSIONS.x - 10, 0, 270, "gterm508", 4],
         [RAMPS_DIMENSIONS.x - 3, 96, 90, "2p54header", 4, 2],
         [RAMPS_DIMENSIONS.x - 3 ,78, 90, "2p54header", 5, 2],
         [RAMPS_DIMENSIONS.x - 3, 62, 90, "2p54header", 4, 2],
@@ -133,9 +136,25 @@ module mounting_standoffs(boardType, type, height) {
 
 module cutouts() {
   union() {
-    translate(OFFSET_ARDUINO_ONSTEP_SHIELD) {
-      translate(OFFSET_ORIGIN_ONSTEP_SHIELD) {
+    translate(OFFSET_ORIGIN_ONSTEP_SHIELD) {
+      translate(OFFSET_ARDUINO_ONSTEP_SHIELD) {
+        // OnStep cutouts
         pcb_cutouts(onstep_ramps_shield);
+      }
+    }
+    translate(OFFSET_ORIGIN_RAMPS) {
+      translate(OFFSET_ARDUINO_RAMPS) {
+        translate([pcb_component_position(ramps_pcb, "gterm508").x, pcb_component_position(ramps_pcb, "gterm508").y, RAMPS_DIMENSIONS.z]) {
+          // RAMPS cutouts
+          block([gt_5p08[1] * 4, gt_5p08[2], gt_5p08[3]]);
+        }
+      }
+    }
+    translate(OFFSET_ORIGIN_ARDUINO) {
+      translate(OFFSET_ARDUINO) {
+        // Arduino cutouts
+        components(MEGA2560, USB);
+        components(MEGA2560, POWER);
       }
     }
   }
@@ -175,9 +194,13 @@ if (DEBUG) {
   %render() housing();
   #render() cutouts();
 } else {
-  housing_base();
+  if (SHOW_LID) {
+    housing_base();
+  }
 
-  translate([HOUSING_DIMENSIONS.x + 20, 0, 0]) {
-    housing();
+  if (SHOW_HOUSING) {
+    translate([SHOW_LID ? HOUSING_DIMENSIONS.x + 20 : 0, 0, 0]) {
+      housing();
+    }
   }
 }
