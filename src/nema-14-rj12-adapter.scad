@@ -6,14 +6,18 @@ include <BOSL/constants.scad>
 use <BOSL/metric_screws.scad>
 use <BOSL/nema_steppers.scad>
 
+include <NopSCADlib/vitamins/inserts.scad>
+use <NopSCADlib/vitamins/insert.scad>
+
 // Thickness of the bracket.
-THICKNESS = 4;
+THICKNESS = 5;
 
 // Either NEMA-11, -14, -17, -23 or -34.
 NEMA_MOTOR_SIZE = 14;
 
-// Metric screw diameter used for mounting the connector PCB.
-SCREW_DIAMETER = 3;
+// Metric screw diameter used for mounting the connector PCB. Choose one of the ones available as a heatfit insert type in NopSCADlib.
+SCREW_TYPE = F1BM3;
+SCREW_DIAMETER = SCREW_TYPE[4];
 
 // Size of the connector to be used.
 CONNECTOR_DIMENSIONS = [15, 25, 20];
@@ -21,8 +25,8 @@ CONNECTOR_DIMENSIONS = [15, 25, 20];
 // Specific to https://www.sparkfun.com/products/14021
 SPARKFUN_BREAKOUT_DIMENSIONS = [20, 20, 1.5];
 SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS = [
-    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, 2, $l / 2],
-    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, $l / 2],
+    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, 2, 0],
+    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, 0],
 ];
 SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [SPARKFUN_BREAKOUT_DIMENSIONS.x - 4, 2, $l];
 SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2, -$l / 2];
@@ -53,7 +57,7 @@ module motor_base() {
 module sparkfun_board_holes() {
     for(hole = SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS) {
         translate(hole) {
-            metric_bolt(size=SCREW_DIAMETER, l=$l, pitch=0);
+            insert_hole(F1BM3);
         }
     }
     translate(SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION) {
