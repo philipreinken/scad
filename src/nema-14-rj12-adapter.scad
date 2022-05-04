@@ -12,6 +12,9 @@ use <NopSCADlib/vitamins/insert.scad>
 // Thickness of the bracket.
 THICKNESS = 5;
 
+// Use heatfit inserts to mount the connector board.
+USE_INSERT = true;
+
 // Either NEMA-11, -14, -17, -23 or -34.
 NEMA_MOTOR_SIZE = 14;
 
@@ -23,13 +26,13 @@ SCREW_DIAMETER = SCREW_TYPE[4];
 CONNECTOR_DIMENSIONS = [15, 25, 20];
 
 // Specific to https://www.sparkfun.com/products/14021
-SPARKFUN_BREAKOUT_DIMENSIONS = [20, 20, 1.5];
+SPARKFUN_BREAKOUT_DIMENSIONS = [21.6, 20.7, 1.55];
 SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS = [
-    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, 2, 0],
-    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, SPARKFUN_BREAKOUT_DIMENSIONS.x - 2, 0],
+    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 1.3, 1.3, 0],
+    [SPARKFUN_BREAKOUT_DIMENSIONS.x - 1.3, SPARKFUN_BREAKOUT_DIMENSIONS.x - 1.3, 0],
 ];
-SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [SPARKFUN_BREAKOUT_DIMENSIONS.x - 4, 2, $l];
-SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2, -$l / 2];
+SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [SPARKFUN_BREAKOUT_DIMENSIONS.x - 6.25, 2.8, $l];
+SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2.8, -$l / 2];
 
 module motor_base_holes() {
     translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, -nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, 0]) {
@@ -57,7 +60,13 @@ module motor_base() {
 module sparkfun_board_holes() {
     for(hole = SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS) {
         translate(hole) {
-            insert_hole(F1BM3);
+            if (USE_INSERT) {
+                insert_hole(SCREW_TYPE);
+            } else {
+                translate([0, 0, $l/2]) {
+                    metric_bolt(size=SCREW_DIAMETER, l=$l, pitch=0);
+                }
+            }
         }
     }
     translate(SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION) {
@@ -90,10 +99,10 @@ module connector_base() {
             translate([-nema_motor_screw_size(NEMA_MOTOR_SIZE), 0, 0]) {
                 cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, THICKNESS, THICKNESS]);
             }
-            translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2 + CONNECTOR_DIMENSIONS.x / 2, CONNECTOR_DIMENSIONS.y + SCREW_DIAMETER * 2, 0]) {
+            translate([0, CONNECTOR_DIMENSIONS.y + SCREW_DIAMETER * 2, 0]) {
                 cylinder(d=SCREW_DIAMETER * 2, h=THICKNESS);
             }
-            translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2 - CONNECTOR_DIMENSIONS.x / 2, CONNECTOR_DIMENSIONS.y + SCREW_DIAMETER * 2, 0]) {
+            translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE), CONNECTOR_DIMENSIONS.y + SCREW_DIAMETER * 2, 0]) {
                 cylinder(d=SCREW_DIAMETER * 2, h=THICKNESS);
             }
         }
