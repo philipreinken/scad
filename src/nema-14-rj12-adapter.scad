@@ -25,6 +25,8 @@ SCREW_DIAMETER = SCREW_TYPE[4];
 // Size of the connector to be used.
 CONNECTOR_DIMENSIONS = [15.7, 20.5, 15];
 
+CONNECTOR_TOLERANCE = 3;
+
 // Specific to https://www.sparkfun.com/products/14021
 SPARKFUN_BREAKOUT_DIMENSIONS = [21.6, 20.7, 1.55];
 SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS = [
@@ -49,7 +51,7 @@ module motor_base() {
             translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE), 0, 0]) {
                 cylinder(d=nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, h=THICKNESS);
             }
-            translate([- nema_motor_screw_size(NEMA_MOTOR_SIZE), CONNECTOR_DIMENSIONS.z, 0]) {
+            translate([- nema_motor_screw_size(NEMA_MOTOR_SIZE), CONNECTOR_DIMENSIONS.z + THICKNESS + SPARKFUN_BREAKOUT_DIMENSIONS.z + CONNECTOR_TOLERANCE, 0]) {
                 cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, THICKNESS, THICKNESS]);
             }
         }
@@ -110,7 +112,7 @@ module connector_base() {
 
 module assembly() {
     motor_base();
-    translate([0, CONNECTOR_DIMENSIONS.z, THICKNESS]) {
+    translate([0, CONNECTOR_DIMENSIONS.z + THICKNESS + SPARKFUN_BREAKOUT_DIMENSIONS.z + CONNECTOR_TOLERANCE, THICKNESS]) {
         rotate([270, 0, 0]) {
             connector_base();
         }
