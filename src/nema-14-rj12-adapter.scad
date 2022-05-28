@@ -15,6 +15,9 @@ THICKNESS = 5;
 // Use heatfit inserts to mount the connector board.
 USE_INSERT = true;
 
+// Use an open cable duct for easier replacement of the bracket.
+OPEN_DUCT = true;
+
 // Either NEMA-11, -14, -17, -23 or -34.
 NEMA_MOTOR_SIZE = 14;
 
@@ -33,8 +36,9 @@ SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS = [
     [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2.9, 2.9, 0],
     [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2.9, SPARKFUN_BREAKOUT_DIMENSIONS.x - 3.9, 0],
 ];
-SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [SPARKFUN_BREAKOUT_DIMENSIONS.x - 6.25, 2.8, $l];
-SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2.8, -$l / 2];
+
+SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [OPEN_DUCT ? SPARKFUN_BREAKOUT_DIMENSIONS.x : SPARKFUN_BREAKOUT_DIMENSIONS.x - 6.25, 2.8, $l];
+SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [OPEN_DUCT ? -6.25 : 0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2.8, -$l / 2];
 
 module motor_base_holes() {
     translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, -nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, 0]) {
