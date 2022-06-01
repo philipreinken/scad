@@ -37,8 +37,11 @@ SPARKFUN_BREAKOUT_MOUNTING_HOLE_POSITIONS = [
     [SPARKFUN_BREAKOUT_DIMENSIONS.x - 2.9, SPARKFUN_BREAKOUT_DIMENSIONS.x - 3.9, 0],
 ];
 
-SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [OPEN_DUCT ? SPARKFUN_BREAKOUT_DIMENSIONS.x : SPARKFUN_BREAKOUT_DIMENSIONS.x - 6.25, 2.8, $l];
-SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [OPEN_DUCT ? -6.25 : 0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2.8, -$l / 2];
+SPARKFUN_BREAKOUT_CABLE_DUCT_DIMENSIONS = [OPEN_DUCT ? SPARKFUN_BREAKOUT_DIMENSIONS.x + $l : SPARKFUN_BREAKOUT_DIMENSIONS.x - 6.25, 2.8, $l];
+SPARKFUN_BREAKOUT_CABLE_DUCT_POSITION = [OPEN_DUCT ? -6.25 -$l : 0, SPARKFUN_BREAKOUT_DIMENSIONS.y - 2.8, -$l / 2];
+
+// Distance from screw hole center to the edge of the bracket.
+PADDING = nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2;
 
 module motor_base_holes() {
     translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, -nema_motor_screw_spacing(NEMA_MOTOR_SIZE) / 2, 0]) {
@@ -50,13 +53,13 @@ module motor_base() {
     difference() {
         hull() {
             translate([0, 0, 0]) {
-                cylinder(d=nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, h=THICKNESS);
+                cylinder(d=PADDING * 2, h=THICKNESS);
             }
             translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE), 0, 0]) {
-                cylinder(d=nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, h=THICKNESS);
+                cylinder(d=PADDING * 2, h=THICKNESS);
             }
-            translate([- nema_motor_screw_size(NEMA_MOTOR_SIZE), CONNECTOR_DIMENSIONS.z + THICKNESS + SPARKFUN_BREAKOUT_DIMENSIONS.z + CONNECTOR_TOLERANCE, 0]) {
-                cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, THICKNESS, THICKNESS]);
+            translate([-PADDING, CONNECTOR_DIMENSIONS.z + THICKNESS + SPARKFUN_BREAKOUT_DIMENSIONS.z + CONNECTOR_TOLERANCE, 0]) {
+                cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + PADDING * 2, THICKNESS, THICKNESS]);
             }
         }
         motor_base_holes();
@@ -100,14 +103,14 @@ module connector_base_holes() {
 module connector_base() {
     difference() {
         hull() {
-            translate([-nema_motor_screw_size(NEMA_MOTOR_SIZE), 0, 0]) {
-                cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + nema_motor_screw_size(NEMA_MOTOR_SIZE) * 2, THICKNESS, THICKNESS]);
+            translate([-PADDING, 0, 0]) {
+                cube([nema_motor_screw_spacing(NEMA_MOTOR_SIZE) + PADDING * 2, THICKNESS, THICKNESS]);
             }
             translate([0, CONNECTOR_DIMENSIONS.y + THICKNESS + SCREW_DIAMETER, 0]) {
-                cylinder(d=SCREW_DIAMETER * 2, h=THICKNESS);
+                cylinder(d=PADDING * 2, h=THICKNESS);
             }
             translate([nema_motor_screw_spacing(NEMA_MOTOR_SIZE), CONNECTOR_DIMENSIONS.y + THICKNESS + SCREW_DIAMETER, 0]) {
-                cylinder(d=SCREW_DIAMETER * 2, h=THICKNESS);
+                cylinder(d=PADDING * 2, h=THICKNESS);
             }
         }
         connector_base_holes();
