@@ -4,17 +4,7 @@ $h = 0.01;
 include <NopSCADlib/vitamins/inserts.scad>
 use <NopSCADlib/vitamins/insert.scad>
 
-RADIUS_LEG = 38.1 / 2;
-
-THICKNESS_CLAMP = 5;
-HEIGHT_CLAMP_GRIP = 20;
-ANGLE_CLAMP_GRIP = 25;
-
-SCREW_TYPE = F1BM3;
-SCREW_DIAMETER = SCREW_TYPE[4];
-
-WIDTH_SADDLE = RADIUS_LEG * 1.25;
-HEIGHT_SADDLE = insert_hole_length(SCREW_TYPE) + THICKNESS_CLAMP;
+include <./cg5-tripod-leg-clamp-variables.scad>
 
 module clamp_grip_ring() {
     difference() {
@@ -61,7 +51,7 @@ module clamp_saddle_holes() {
         translate(translation_vector) {
             translate([0, -RADIUS_LEG -HEIGHT_SADDLE, 0]) {
                 rotate([90, 0, 0]) {
-                    insert_hole(SCREW_TYPE);
+                    children(0);
                 }
             }
         }
@@ -76,9 +66,8 @@ module clamp_saddle() {
         translate([0, 0, -$h]) {
             cylinder(r=RADIUS_LEG + THICKNESS_CLAMP, h=HEIGHT_CLAMP_GRIP + $h * 2);
         }
-        clamp_saddle_holes();
+        clamp_saddle_holes() {
+            insert_hole(SCREW_TYPE);
+        }
     }
 }
-
-clamp_grip();
-clamp_saddle();
